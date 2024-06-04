@@ -1,13 +1,13 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
-fn main() {
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
-    println!("Logs from your program will appear here!");
+mod utils;
 
-    // Uncomment this block to pass the first stage
-    // print!("$ ");
-    // io::stdout().flush().unwrap();
+fn main() {
+    utils::logger::setup().expect("Unable to setup logger");
+
+    print!("$ ");
+    io::stdout().flush().unwrap();
 
     // Wait for user input
     let stdin = io::stdin();
