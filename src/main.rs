@@ -1,8 +1,9 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
-use anyhow::Context;
+use commands::Command;
 
+mod commands;
 mod utils;
 
 fn main() {
@@ -16,10 +17,14 @@ fn main() {
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        println!("{}: command not found", input.trim());
-        io::stdout()
-            .flush()
-            .context(fdbg!("Failed to flush stdout"))
-            .unwrap();
+        match Command::from(input.trim()) {
+            Ok(cmd) => cmd.execute(),
+            Err(err) => {
+                io::stderr()
+                    .write_all(format!("{}\n", err).as_bytes())
+                    .expect("Failed to write to stderr");
+                io::stderr().flush().expect("Failed to flush stdout");
+            }
+        }
     }
 }
