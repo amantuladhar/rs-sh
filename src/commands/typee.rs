@@ -1,11 +1,9 @@
-use std::io::Write;
-
 use super::{Command, CommandError};
 
 pub(crate) fn type_cmd(command: &str) {
     use Command::*;
     if command.is_empty() {
-        std::io::stderr().write_all("".as_bytes());
+        eprint!("");
         return;
     }
     match Command::from(command) {
