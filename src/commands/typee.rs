@@ -7,11 +7,11 @@ pub(crate) fn type_cmd(command: &str) {
         return;
     }
     match Command::from(command) {
-        Ok(Exit(..) | Echo(..) | Type(..) | Pwd | Noop | Cd(..)) => {
-            println!("{} is a shell builtin", command);
-        }
         Ok(External { path, .. }) => {
             println!("{} is {}", command, path);
+        }
+        Ok(_) => {
+            println!("{} is a shell builtin", command);
         }
         Err(CommandError::NotFound(..)) => {
             eprintln!("{} not found", command)

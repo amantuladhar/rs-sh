@@ -19,12 +19,9 @@ fn main() {
 
         match Command::from(input.trim()) {
             Ok(cmd) => cmd.execute(),
-            Err(err) => {
-                io::stderr()
-                    .write_all(format!("{}\n", err).as_bytes())
-                    .expect("Failed to write to stderr");
-            }
+            Err(err) => eprintln!("{err}"),
         };
+
         io::stdout().flush().unwrap();
         io::stderr().flush().unwrap();
     }
