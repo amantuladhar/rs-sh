@@ -1,5 +1,6 @@
 use error::CommandError;
 
+pub(crate) mod cd;
 pub(crate) mod echo;
 pub(crate) mod error;
 pub(crate) mod exit;
@@ -13,6 +14,7 @@ pub enum Command {
     Exit(i32),
     Type(String),
     Pwd,
+    Cd(String),
     External {
         cmd: String,
         args: String,
@@ -29,6 +31,7 @@ impl Command {
             Exit(code) => exit::exit_cmd(*code),
             Type(args) => typee::type_cmd(args),
             Pwd => pwd::pwd_cmd(),
+            Cd(args) => cd::cd_cmd(args),
             External { .. } => external::external_cmd(self),
         }
     }
@@ -43,7 +46,8 @@ impl Command {
             "echo" => echo::parse_echo_cmd(args)?,
             "exit" => exit::parse_exit_cmd(args)?,
             "type" => typee::parse_type_cmd(args)?,
-            "pwd" => Command::Pwd,
+            "pwd" => pwd::parse_pwd_cmd()?,
+            "cd" => cd::parse_cd_cmd(args)?,
             _ => match external::parse_external_cmd(cmd, args) {
                 Some(cmd) => cmd,
                 None => return Err(CommandError::NotFound(cmd.to_string())),
