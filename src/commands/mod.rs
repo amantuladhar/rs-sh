@@ -4,6 +4,7 @@ pub(crate) mod echo;
 pub(crate) mod error;
 pub(crate) mod exit;
 pub(crate) mod external;
+pub(crate) mod pwd;
 pub(crate) mod typee;
 
 pub enum Command {
@@ -11,6 +12,7 @@ pub enum Command {
     Echo(String),
     Exit(i32),
     Type(String),
+    Pwd,
     External {
         cmd: String,
         args: String,
@@ -26,6 +28,7 @@ impl Command {
             Echo(args) => echo::echo_cmd(args),
             Exit(code) => exit::exit_cmd(*code),
             Type(args) => typee::type_cmd(args),
+            Pwd => pwd::pwd_cmd(),
             External { .. } => external::external_cmd(self),
         }
     }
@@ -40,6 +43,7 @@ impl Command {
             "echo" => echo::parse_echo_cmd(args)?,
             "exit" => exit::parse_exit_cmd(args)?,
             "type" => typee::parse_type_cmd(args)?,
+            "pwd" => Command::Pwd,
             _ => match external::parse_external_cmd(cmd, args) {
                 Some(cmd) => cmd,
                 None => return Err(CommandError::NotFound(cmd.to_string())),

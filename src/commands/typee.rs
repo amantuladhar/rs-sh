@@ -7,7 +7,7 @@ pub(crate) fn type_cmd(command: &str) {
         return;
     }
     match Command::from(command) {
-        Ok(Exit(..) | Echo(..) | Type(..) | Noop) => {
+        Ok(Exit(..) | Echo(..) | Type(..) | Pwd | Noop) => {
             println!("{} is a shell builtin", command);
         }
         Ok(External { path, .. }) => {
