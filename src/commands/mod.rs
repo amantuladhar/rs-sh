@@ -3,30 +3,38 @@ use error::CommandError;
 pub(crate) mod echo;
 pub(crate) mod error;
 pub(crate) mod exit;
+pub(crate) mod typee;
 
-pub enum BuiltInCommand {
+pub enum Command {
     Noop,
-    Echo(Vec<String>),
+    Echo(String),
     Exit(i32),
+    Type(String),
 }
 
-impl BuiltInCommand {
+impl Command {
     pub fn execute(&self) {
+        use Command::*;
         match self {
-            BuiltInCommand::Noop => (),
-            BuiltInCommand::Echo(args) => echo::echo_cmd(args),
-            BuiltInCommand::Exit(code) => exit::exit_cmd(*code),
+            Noop => (),
+            Echo(args) => echo::echo_cmd(args),
+            Exit(code) => exit::exit_cmd(*code),
+            Type(args) => typee::type_cmd(args),
         }
     }
 
     pub fn from(input: &str) -> Result<Self, CommandError> {
-        let mut input = input.trim().split(" ").into_iter();
-        let command = input.next().expect("No command provided");
-        match command {
-            "" => Ok(BuiltInCommand::Noop),
-            "echo" => echo::parse_echo_cmd(&mut input),
-            "exit" => exit::parse_exit_cmd(&mut input),
-            _ => Err(CommandError::NotFound(command.to_string())),
-        }
+        use Command::*;
+        let input = input.trim().splitn(2, ' ').collect::<Vec<&str>>();
+        let command = input.get(0).copied().unwrap_or("");
+        let args = input.get(1).copied().unwrap_or("");
+        let command = match command {
+            "" => Noop,
+            "echo" => echo::parse_echo_cmd(args)?,
+            "exit" => exit::parse_exit_cmd(args)?,
+            "type" => typee::parse_type_cmd(args)?,
+            _ => return Err(CommandError::NotFound(command.to_string())),
+        };
+        Ok(command)
     }
 }

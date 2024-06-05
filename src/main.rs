@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
-use commands::BuiltInCommand;
+use commands::Command;
 
 mod commands;
 mod utils;
@@ -17,14 +17,15 @@ fn main() {
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        match BuiltInCommand::from(input.trim()) {
+        match Command::from(input.trim()) {
             Ok(cmd) => cmd.execute(),
             Err(err) => {
                 io::stderr()
                     .write_all(format!("{}\n", err).as_bytes())
                     .expect("Failed to write to stderr");
-                io::stderr().flush().expect("Failed to flush stdout");
             }
-        }
+        };
+        io::stdout().flush().unwrap();
+        io::stderr().flush().unwrap();
     }
 }

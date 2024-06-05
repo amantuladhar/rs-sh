@@ -1,18 +1,9 @@
-use super::{BuiltInCommand, CommandError};
-use std::{
-    io::{self, Write},
-    str::Split,
-};
+use super::{Command, CommandError};
 
-pub(crate) fn echo_cmd(args: &Vec<String>) {
-    println!("{}", args.join(" "));
-    io::stdout().flush().unwrap();
+pub(crate) fn echo_cmd(args: &str) {
+    println!("{}", args);
 }
 
-pub(crate) fn parse_echo_cmd<'a>(input: &mut Split<&str>) -> Result<BuiltInCommand, CommandError> {
-    let args = input
-        .into_iter()
-        .map(|s| s.to_string())
-        .collect::<Vec<String>>();
-    Ok(BuiltInCommand::Echo(args))
+pub(crate) fn parse_echo_cmd(args: &str) -> Result<Command, CommandError> {
+    Ok(Command::Echo(args.to_owned()))
 }
