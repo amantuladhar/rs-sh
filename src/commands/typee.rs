@@ -10,6 +10,9 @@ pub(crate) fn type_cmd(command: &str) {
         Ok(Exit(..) | Echo(..) | Type(..) | Noop) => {
             println!("{} is a shell builtin", command);
         }
+        Ok(External { path, .. }) => {
+            println!("{} is {}", command, path);
+        }
         Err(CommandError::NotFound(..)) => {
             eprintln!("{} not found", command)
         }
