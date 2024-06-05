@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
-use commands::Command;
+use commands::BuiltInCommand;
 
 mod commands;
 mod utils;
@@ -17,7 +17,7 @@ fn main() {
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        match Command::from(input.trim()) {
+        match BuiltInCommand::from(input.trim()) {
             Ok(cmd) => cmd.execute(),
             Err(err) => {
                 io::stderr()

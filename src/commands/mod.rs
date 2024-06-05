@@ -4,18 +4,18 @@ pub(crate) mod echo;
 pub(crate) mod error;
 pub(crate) mod exit;
 
-pub enum Command {
+pub enum BuiltInCommand {
     Noop,
     Echo(Vec<String>),
     Exit(i32),
 }
 
-impl Command {
+impl BuiltInCommand {
     pub fn execute(&self) {
         match self {
-            Command::Noop => (),
-            Command::Echo(args) => echo::echo_cmd(args),
-            Command::Exit(code) => exit::exit_cmd(*code),
+            BuiltInCommand::Noop => (),
+            BuiltInCommand::Echo(args) => echo::echo_cmd(args),
+            BuiltInCommand::Exit(code) => exit::exit_cmd(*code),
         }
     }
 
@@ -23,7 +23,7 @@ impl Command {
         let mut input = input.trim().split(" ").into_iter();
         let command = input.next().expect("No command provided");
         match command {
-            "" => Ok(Command::Noop),
+            "" => Ok(BuiltInCommand::Noop),
             "echo" => echo::parse_echo_cmd(&mut input),
             "exit" => exit::parse_exit_cmd(&mut input),
             _ => Err(CommandError::NotFound(command.to_string())),
