@@ -26,7 +26,7 @@ impl Command {
             Echo(args) => echo::echo_cmd(args),
             Exit(code) => exit::exit_cmd(*code),
             Type(args) => typee::type_cmd(args),
-            External { .. } => (),
+            External { .. } => external::external_cmd(self),
         }
     }
 
