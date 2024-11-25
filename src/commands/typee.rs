@@ -14,7 +14,7 @@ pub(crate) fn type_cmd(command: &str) {
             println!("{} is a shell builtin", command);
         }
         Err(CommandError::NotFound(..)) => {
-            eprintln!("{} not found", command)
+            eprintln!("{}: not found", command)
         }
     };
 }
