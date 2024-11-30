@@ -12,6 +12,11 @@ pub(crate) fn cd_cmd(args: &str) {
     }
 }
 
-pub(crate) fn parse_cd_cmd(args: &str) -> Result<Command, CommandError> {
-    Ok(Command::Cd(args.to_owned()))
+pub(crate) fn parse_cd_cmd(args: Vec<String>) -> Result<Command, CommandError> {
+    let arg = if args.is_empty() {
+        "".to_string()
+    } else {
+        args[0].clone()
+    };
+    Ok(Command::Cd(arg))
 }

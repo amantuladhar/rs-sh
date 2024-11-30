@@ -7,14 +7,14 @@ pub(crate) fn external_cmd(cmd: &Command) {
         return;
     };
     let output = StdCommand::new(path)
-        .args(args.split(' '))
+        .args(args)
         .output()
         .expect("failed to execute process");
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
 }
 
-pub(crate) fn parse_external_cmd(cmd: &str, args: &str) -> Option<Command> {
+pub(crate) fn parse_external_cmd(cmd: &str, args: Vec<String>) -> Option<Command> {
     let Ok(path_env) = std::env::var("PATH") else {
         return None;
     };
@@ -27,7 +27,7 @@ pub(crate) fn parse_external_cmd(cmd: &str, args: &str) -> Option<Command> {
         .find_map(Result::ok)
         .map(|path| External {
             cmd: cmd.to_string(),
-            args: args.to_string(),
+            args,
             path,
         })
 }

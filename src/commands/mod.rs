@@ -1,4 +1,8 @@
+use std::str::FromStr;
+
 use error::CommandError;
+
+use crate::args_parser::ArgsParser;
 
 pub(crate) mod cd;
 pub(crate) mod echo;
@@ -10,14 +14,15 @@ pub(crate) mod typee;
 
 pub enum Command {
     Noop,
-    Echo(String),
+    Echo(Vec<String>),
     Exit(i32),
     Type(String),
     Pwd,
     Cd(String),
     External {
+        #[allow(dead_code)]
         cmd: String,
-        args: String,
+        args: Vec<String>,
         path: String,
     },
 }
@@ -35,12 +40,24 @@ impl Command {
             External { .. } => external::external_cmd(self),
         }
     }
+}
 
-    pub fn from(input: &str) -> Result<Self, CommandError> {
+impl FromStr for Command {
+    type Err = CommandError;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
         use Command::*;
         let input = input.trim().splitn(2, ' ').collect::<Vec<&str>>();
         let cmd = input.get(0).copied().unwrap_or("");
-        let args = input.get(1).copied().unwrap_or("");
+
+        let args = {
+            let args = input.get(1).copied().unwrap_or("");
+            let mut parser = ArgsParser::new(args);
+            match parser.get_processed_args() {
+                Err(e) => return Err(CommandError::ArgsParserError(e)),
+                Ok(args) => args,
+            }
+        };
+
         Ok(match cmd {
             "" => Noop,
             "echo" => echo::parse_echo_cmd(args)?,

@@ -1,8 +1,10 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::str::FromStr;
 
 use commands::Command;
 
+pub mod args_parser;
 mod commands;
 mod utils;
 
@@ -17,7 +19,7 @@ fn main() {
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        match Command::from(input.trim()) {
+        match Command::from_str(input.trim()) {
             Ok(cmd) => cmd.execute(),
             Err(err) => eprintln!("{err}"),
         };
