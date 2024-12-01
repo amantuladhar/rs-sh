@@ -30,18 +30,26 @@ impl<'a> ArgsParser<'a> {
     fn consume(&mut self) -> &str {
         let cur = &self.source[self.cur_pos..self.cur_pos + 1];
         self.cur_pos += 1;
-        return cur;
+        cur
     }
 
     fn unquoted_arg(&mut self) -> Result<String, ArgsParseError> {
-        let start = self.cur_pos;
-        while self.peek() != " " {
+        let mut arg = String::new();
+        loop {
+            let p = self.peek();
             if self.is_at_end(0) {
                 break;
             }
-            let _ = self.consume();
+            match p {
+                " " => break,
+                "\\" => {
+                    let _ = self.consume();
+                    continue;
+                }
+                _ => arg.push_str(self.consume()),
+            }
         }
-        return Ok(self.source[start..self.cur_pos].to_owned());
+        Ok(arg)
     }
 
     fn double_quote_arg(&mut self) -> Result<String, ArgsParseError> {
