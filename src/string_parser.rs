@@ -1,15 +1,15 @@
 use thiserror::Error;
 
-pub struct ArgsParser<'a> {
+pub struct StringParser<'a> {
     source: &'a str,
     cur_pos: usize,
 }
 
-impl<'a> ArgsParser<'a> {
+impl<'a> StringParser<'a> {
     pub fn new(source: &'a str) -> Self {
         Self { source, cur_pos: 0 }
     }
-    pub fn get_processed_args(&mut self) -> Result<Vec<String>, ArgsParseError> {
+    pub fn get_processed_args(&mut self) -> Result<Vec<String>, StringParseError> {
         let mut args = Vec::new();
         while !self.is_at_end(0) {
             let cur = self.peek();
@@ -33,7 +33,7 @@ impl<'a> ArgsParser<'a> {
         cur
     }
 
-    fn unquoted_arg(&mut self) -> Result<String, ArgsParseError> {
+    fn unquoted_arg(&mut self) -> Result<String, StringParseError> {
         let mut arg = String::new();
         loop {
             let p = self.peek();
@@ -52,7 +52,7 @@ impl<'a> ArgsParser<'a> {
         Ok(arg)
     }
 
-    fn double_quote_arg(&mut self) -> Result<String, ArgsParseError> {
+    fn double_quote_arg(&mut self) -> Result<String, StringParseError> {
         let _ = self.consume(); // consume start "
         let mut arg = String::new();
         loop {
@@ -89,12 +89,12 @@ impl<'a> ArgsParser<'a> {
         Ok(arg)
     }
 
-    fn single_quote_arg(&mut self) -> Result<String, ArgsParseError> {
+    fn single_quote_arg(&mut self) -> Result<String, StringParseError> {
         let _ = self.consume();
         let start = self.cur_pos;
         while self.peek() != "'" {
             if self.is_at_end(0) {
-                return Err(ArgsParseError::UnterminatedQuote);
+                return Err(StringParseError::UnterminatedQuote);
             }
             let _ = self.consume();
         }
@@ -115,7 +115,7 @@ impl<'a> ArgsParser<'a> {
 }
 
 #[derive(Error, Debug)]
-pub enum ArgsParseError {
+pub enum StringParseError {
     #[error("unterminated quote")]
     UnterminatedQuote,
 }

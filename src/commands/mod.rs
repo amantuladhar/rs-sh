@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use error::CommandError;
 
-use crate::args_parser::ArgsParser;
+use crate::string_parser::StringParser;
 
 pub(crate) mod cd;
 pub(crate) mod echo;
@@ -46,19 +46,21 @@ impl FromStr for Command {
     type Err = CommandError;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         use Command::*;
-        let input = input.trim().splitn(2, ' ').collect::<Vec<&str>>();
-        let cmd = input.get(0).copied().unwrap_or("");
-
-        let args = {
-            let args = input.get(1).copied().unwrap_or("");
-            let mut parser = ArgsParser::new(args);
+        let input = {
+            let mut parser = StringParser::new(input);
             match parser.get_processed_args() {
-                Err(e) => return Err(CommandError::ArgsParserError(e)),
+                Err(e) => return Err(CommandError::StringParseError(e)),
                 Ok(args) => args,
             }
         };
+        let cmd = input.get(0).ok_or_else(|| CommandError::UnknownError)?;
+        let args = if input.len() > 1 {
+            input[1..].to_vec()
+        } else {
+            vec![]
+        };
 
-        Ok(match cmd {
+        Ok(match cmd.as_str() {
             "" => Noop,
             "echo" => echo::parse_echo_cmd(args)?,
             "exit" => exit::parse_exit_cmd(args)?,

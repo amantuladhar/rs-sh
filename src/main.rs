@@ -4,8 +4,8 @@ use std::str::FromStr;
 
 use commands::Command;
 
-pub mod args_parser;
 mod commands;
+mod string_parser;
 mod utils;
 
 fn main() {
