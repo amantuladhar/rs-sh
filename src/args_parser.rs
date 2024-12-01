@@ -53,16 +53,39 @@ impl<'a> ArgsParser<'a> {
     }
 
     fn double_quote_arg(&mut self) -> Result<String, ArgsParseError> {
-        let _ = self.consume();
-        let start = self.cur_pos;
-        while self.peek() != "\"" {
+        let _ = self.consume(); // consume start "
+        let mut arg = String::new();
+        loop {
+            let p = self.peek();
             if self.is_at_end(0) {
-                return Err(ArgsParseError::UnterminatedQuote);
+                break;
             }
-            let _ = self.consume();
+            match p {
+                "\"" => {
+                    let _ = self.consume();
+                    if self.peek() == " " {
+                        break;
+                    }
+                }
+                // TODO: Implement all special escape sequences
+                // https://www.gnu.org/software/bash/manual/bash.html#Double-Quotes
+                "\\" => {
+                    let _ = self.consume();
+                    match self.consume() {
+                        "n" => arg.push_str("\\n"),
+                        "\\" => arg.push_str("\\"),
+                        "\"" => arg.push_str("\""),
+                        e => {
+                            arg.push_str("\\");
+                            arg.push_str(e);
+                        }
+                    }
+                    continue;
+                }
+                _ => arg.push_str(self.consume()),
+            }
         }
-        let _ = self.consume();
-        Ok(self.source[start..self.cur_pos - 1].to_owned())
+        Ok(arg)
     }
 
     fn single_quote_arg(&mut self) -> Result<String, ArgsParseError> {
