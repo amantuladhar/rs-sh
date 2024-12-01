@@ -45,7 +45,16 @@ impl<'a> ArgsParser<'a> {
     }
 
     fn double_quote_arg(&mut self) -> Result<String, ArgsParseError> {
-        todo!()
+        let _ = self.consume();
+        let start = self.cur_pos;
+        while self.peek() != "\"" {
+            if self.is_at_end(0) {
+                return Err(ArgsParseError::UnterminatedQuote);
+            }
+            let _ = self.consume();
+        }
+        let _ = self.consume();
+        Ok(self.source[start..self.cur_pos - 1].to_owned())
     }
 
     fn single_quote_arg(&mut self) -> Result<String, ArgsParseError> {
