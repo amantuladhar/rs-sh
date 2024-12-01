@@ -63,6 +63,7 @@ impl<'a> ArgsParser<'a> {
             match p {
                 "\"" => {
                     let _ = self.consume();
+                    // If we don't see space yet, we need to continue parsing current arg
                     if self.peek() == " " {
                         break;
                     }
